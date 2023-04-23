@@ -7,10 +7,14 @@ public class Basket {
     private int cartPrice;
     private File basket;
 
-    public Basket (String[] products, int[] price) {
+    public Basket (String[] products, int[] price, boolean fileIsExsists) {
         this.products = products;
         this.price = price;
         productsInCart = new int[products.length];
+
+        if (fileIsExsists) {
+            loadFromTxtFile(basket);
+        }
     }
 
     public Basket (String[] products, int[] price, int[] productsInCart, int cartPrice) {
@@ -23,6 +27,7 @@ public class Basket {
     public void addToCart (int productNum, int amount) {
         productsInCart[productNum - 1] += amount;
         cartPrice += price[productNum] * amount;
+        saveTxt(basket);
     }
 
     public void printCart() {
@@ -31,6 +36,7 @@ public class Basket {
         for (int i = 0; i < products.length; i++) {
 
             if (productsInCart[i] != 0) {
+
                 int fullPrice = price[i] * productsInCart[i];
                 System.out.println(products[i] + " " + productsInCart[i] + " шт " + price[i] + " руб/шт " + fullPrice + " руб в сумме");
                 System.out.println("Итого " + cartPrice + " руб");
@@ -38,7 +44,7 @@ public class Basket {
         }
     }
 
-    public void SaveTxt (File textFile) {
+    public void saveTxt (File textFile) {
         textFile = new File("Basket.txt");
 
         if (!textFile.exists()) {
@@ -81,6 +87,7 @@ public class Basket {
         String cartSum = null;
         String productsLine = null;
         String priceLine = null;
+
 
         try (BufferedReader br = new BufferedReader(new FileReader(textFile))) {
             cartLine = br.readLine();
