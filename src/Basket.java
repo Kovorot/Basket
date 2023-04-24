@@ -7,12 +7,12 @@ public class Basket {
     private int cartPrice;
     private File basket;
 
-    public Basket (String[] products, int[] price, boolean fileIsExsists) {
+    public Basket (String[] products, int[] price, boolean fileIsExists) {
         this.products = products;
         this.price = price;
         productsInCart = new int[products.length];
 
-        if (fileIsExsists) {
+        if (fileIsExists) {
             loadFromTxtFile(basket);
         }
     }
@@ -121,5 +121,30 @@ public class Basket {
         }
 
         return new Basket (products, price, cart, cartPrice);
+    }
+
+    public void saveBin(File file) {
+
+        try (FileOutputStream fos = new FileOutputStream("Basket.bin");
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(file);
+        } catch (IOException io) {
+            System.out.println("Файл открыт");
+        }
+    }
+
+    public static Basket loadFromBinFile(File file) {
+        Basket loadedBasket = null;
+
+        try (FileInputStream fis = new FileInputStream(file);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            loadedBasket = (Basket) ois.readObject();
+        } catch (IOException io) {
+            System.out.println("Файл открыт");
+        } catch (ClassNotFoundException cnf) {
+            System.out.println("ERR");
+        }
+
+        return loadedBasket;
     }
 }

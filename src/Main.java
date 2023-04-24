@@ -1,7 +1,7 @@
-import java.io.File;
+import java.io.*;
 import java.util.Scanner;
 
-public class Main {
+public class Main implements Serializable {
     public static void main(String[] args) {
         String[] products = {"Молоко", "Хлеб", "Гречневая крупа"};
         int[] price = {50, 14, 80};
