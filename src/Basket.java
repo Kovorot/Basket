@@ -13,7 +13,7 @@ public class Basket {
         productsInCart = new int[products.length];
 
         if (fileIsExists) {
-            loadFromTxtFile(basket);
+            loadFromBinFile(basket);
         }
     }
 
@@ -27,7 +27,7 @@ public class Basket {
     public void addToCart (int productNum, int amount) {
         productsInCart[productNum - 1] += amount;
         cartPrice += price[productNum] * amount;
-        saveTxt(basket);
+        saveBin(basket);
     }
 
     public void printCart() {
