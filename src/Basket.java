@@ -44,7 +44,7 @@ public class Basket {
         }
     }
 
-    public void saveTxt (File textFile) {
+    private File checkFile(File textFile) {
         textFile = new File("Basket.txt");
 
         if (!textFile.exists()) {
@@ -56,7 +56,13 @@ public class Basket {
             }
         }
 
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(textFile))) {
+        return textFile;
+    }
+
+    public void saveTxt (File textFile) {
+        File file = checkFile(textFile);
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 
             for (int i = 0; i < products.length; i++) {
                 bw.write(productsInCart[i]);

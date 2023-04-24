@@ -12,11 +12,11 @@ public class Main {
         File file = new File("Basket.txt");
         
         if (file.exists()) {
-            boolean fileIsExsists = true;
-            basket = new Basket(products, price, fileIsExsists);
+            boolean fileIsExists = true;
+            basket = new Basket(products, price, fileIsExists);
         } else {
-            boolean fileIsExsists = false;
-            basket = new Basket(products, price, fileIsExsists);
+            boolean fileIsExists = false;
+            basket = new Basket(products, price, fileIsExists);
         }
 
         while (!isEnd) {
