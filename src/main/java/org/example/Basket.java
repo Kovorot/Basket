@@ -8,28 +8,59 @@ public class Basket {
     private int[] productsInCart;
     private int cartPrice;
     private File basket;
+    private int usingCount = 0;
 
-    public Basket (String[] products, int[] price, boolean fileIsExsists) {
+    public Basket(String[] products, int[] price) {
         this.products = products;
         this.price = price;
         productsInCart = new int[products.length];
-
-        if (fileIsExsists) {
-            loadFromTxtFile(basket);
-        }
     }
 
-    public Basket (String[] products, int[] price, int[] productsInCart, int cartPrice) {
+    public Basket(String[] products, int[] price, int[] productsInCart, int cartPrice) {
         this.products = products;
         this.price = price;
         this.productsInCart = productsInCart;
         this.cartPrice = cartPrice;
     }
 
-    public void addToCart (int productNum, int amount) {
+    public static Basket loadFromTxtFile(File textFile) {
+        String cartLine = null;
+        String cartSum = null;
+        String productsLine = null;
+        String priceLine = null;
+
+
+        try (BufferedReader br = new BufferedReader(new FileReader(textFile))) {
+            cartLine = br.readLine();
+            cartSum = br.readLine();
+            productsLine = br.readLine();
+            priceLine = br.readLine();
+        } catch (IOException e) {
+            System.out.println("Файл открыт");
+        }
+
+        String[] cartParts = cartLine.split(" ");
+        String[] productsParts = productsLine.split(" ");
+        String[] priceParts = priceLine.split(" ");
+
+        int[] cart = new int[cartParts.length];
+        String[] products = new String[productsParts.length];
+        int[] price = new int[priceParts.length];
+
+        int cartPrice = Integer.parseInt(cartSum);
+
+        for (int i = 0; i < cartParts.length; i++) {
+            cart[i] = Integer.parseInt(cartParts[i]);
+            products[i] = productsParts[i];
+            price[i] = Integer.parseInt(priceParts[i]);
+        }
+
+        return new Basket(products, price, cart, cartPrice);
+    }
+
+    public void addToCart(int productNum, int amount) {
         productsInCart[productNum - 1] += amount;
         cartPrice += price[productNum] * amount;
-        saveTxt(basket);
     }
 
     public void printCart() {
@@ -46,7 +77,7 @@ public class Basket {
         }
     }
 
-    public void saveTxt (File textFile) {
+    public void saveTxt(File textFile) {
         textFile = new File("Basket.txt");
 
         if (!textFile.exists()) {
@@ -84,38 +115,7 @@ public class Basket {
         }
     }
 
-    public static Basket loadFromTxtFile(File textFile) {
-        String cartLine = null;
-        String cartSum = null;
-        String productsLine = null;
-        String priceLine = null;
-
-
-        try (BufferedReader br = new BufferedReader(new FileReader(textFile))) {
-            cartLine = br.readLine();
-            cartSum = br.readLine();
-            productsLine = br.readLine();
-            priceLine = br.readLine();
-        } catch (IOException e) {
-            System.out.println("Файл открыт");
-        }
-
-        String[] cartParts = cartLine.split(" ");
-        String[] productsParts = productsLine.split(" ");
-        String[] priceParts = priceLine.split(" ");
-
-        int[] cart = new int[cartParts.length];
-        String[] products = new String[productsParts.length];
-        int[] price = new int[priceParts.length];
-
-        int cartPrice = Integer.parseInt(cartSum);
-
-        for (int i = 0; i < cartParts.length; i++) {
-            cart[i] = Integer.parseInt(cartParts[i]);
-            products[i] = productsParts[i];
-            price[i] = Integer.parseInt(priceParts[i]);
-        }
-
-        return new Basket (products, price, cart, cartPrice);
+    public int getUsingCount() {
+        return usingCount;
     }
 }

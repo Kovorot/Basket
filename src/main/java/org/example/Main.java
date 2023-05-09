@@ -1,25 +1,31 @@
 package org.example;
 
-import java.io.File;
+import java.io.*;
 import java.util.Scanner;
 
-public class Main {
+public class Main implements Serializable {
     public static void main(String[] args) {
         String[] products = {"Молоко", "Хлеб", "Гречневая крупа"};
         int[] price = {50, 14, 80};
         String input;
         boolean isEnd = false;
-        Basket basket;
+        Basket basket = null;
         Scanner scanner = new Scanner(System.in);
-        File file = new File("Basket.txt");
-        
+        File file = new File("Basket.json");
+
         if (file.exists()) {
-            boolean fileIsExsists = true;
-            basket = new Basket(products, price, fileIsExsists);
+
+            //Десериализация из .json файла
+            try (FileInputStream fis = new FileInputStream(file);
+                 ObjectInputStream ois = new ObjectInputStream(fis)) {
+                basket = (Basket) ois.readObject();
+            } catch (Exception ex) {
+                System.out.println("ERR");
+            }
         } else {
-            boolean fileIsExsists = false;
-            basket = new Basket(products, price, fileIsExsists);
+            basket = new Basket(products, price);
         }
+        ClientLog clientLog = new ClientLog(products, basket);
 
         while (!isEnd) {
             System.out.println("Список возможных товаров для покупки");
@@ -33,14 +39,23 @@ public class Main {
 
             if (input.equals("end")) {
                 basket.printCart();
+                clientLog.exportAsCSV(new File("data.json")); //Вызов метода exportAsCSV
                 isEnd = true;
             } else {
-
                 try {
                     String[] parts = input.split(" ");
                     int productNum = Integer.parseInt(parts[0]);
                     int amount = Integer.parseInt(parts[1]);
                     basket.addToCart(productNum, amount);
+                    clientLog.log(productNum, amount); //Вызов метода log
+
+                    // Сериализация через .json файл
+                    try (FileOutputStream fos = new FileOutputStream(file);
+                         ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                        oos.writeObject(basket);
+                    } catch (IOException e) {
+                        System.out.println("Файл открыт");
+                    }
                 } catch (NumberFormatException nf) {
                     System.out.println("Введено некорректное значение");
                 } catch (IndexOutOfBoundsException out) {
