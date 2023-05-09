@@ -18,12 +18,8 @@ public class ClientLog {
     protected void log (int productNum, int amount) {
         productList[productNum] += amount;
         JSONObject obj = new JSONObject();
-        JSONArray list = new JSONArray();
-
-        for (int i = 0; i < productList.length; i++) {
-            list.add(productList[i]);
-        }
-        obj.put("productList", list);
+        obj.put("productNum", productNum);
+        obj.put("amount", amount);
 
         try (FileWriter fw = new FileWriter("data.json")) {
             fw.write(obj.toJSONString());
