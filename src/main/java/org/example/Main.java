@@ -15,7 +15,7 @@ public class Main implements Serializable {
         Basket basket = null;
         Scanner scanner = new Scanner(System.in);
 
-        XMLData xmlData = new XMLData();
+        XMLData xmlData = new XMLData(); //XML
         xmlData.readXML();
 
         if (xmlData.getLoad()[0].equals("true")) {
