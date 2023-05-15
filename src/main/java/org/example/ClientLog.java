@@ -5,7 +5,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 
 public class ClientLog {
@@ -17,17 +22,14 @@ public class ClientLog {
         this.basket = basket;
     }
 
-    protected void log(int productNum, int amount) {
+    protected void log(int productNum, int amount, File file) {
         productList[productNum] += amount;
-        JSONObject obj = new JSONObject();
-        obj.put("productNum", productNum);
-        obj.put("amount", amount);
+        String[] employee = {String.valueOf(productNum), String.valueOf(amount)};
 
-        try (FileWriter fw = new FileWriter("data.json")) {
-            fw.write(obj.toJSONString());
-            fw.flush();
+        try (CSVWriter writer = new CSVWriter(new FileWriter(file))) {
+            writer.writeNext(employee);
         } catch (IOException e) {
-            System.out.println("Файл открыт");
+            e.printStackTrace();
         }
 
     }
@@ -60,7 +62,7 @@ public class ClientLog {
                 dataList[ii] = productNumList[ii] + "," + amountList[ii];
             }
 
-            try (CSVWriter writer = new CSVWriter(new FileWriter("log.csv", true))) {
+            try (CSVWriter writer = new CSVWriter(new FileWriter("client.csv", true))) {
 
                 for (String data : dataList) {
                     String[] parts = data.split(",");

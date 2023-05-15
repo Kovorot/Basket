@@ -1,31 +1,44 @@
 package org.example;
 
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.Scanner;
 
 public class Main implements Serializable {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
         String[] products = {"Молоко", "Хлеб", "Гречневая крупа"};
         int[] price = {50, 14, 80};
         String input;
         boolean isEnd = false;
         Basket basket = null;
         Scanner scanner = new Scanner(System.in);
-        File file = new File("Basket.json");
 
-        if (file.exists()) {
+        XMLData xmlData = new XMLData();
+        xmlData.readXML();
 
-            //Десериализация из .json файла
-            try (FileInputStream fis = new FileInputStream(file);
-                 ObjectInputStream ois = new ObjectInputStream(fis)) {
-                basket = (Basket) ois.readObject();
-            } catch (Exception ex) {
-                System.out.println("ERR");
+        if (xmlData.getLoad()[0].equals("true")) {
+
+            if (xmlData.getLoad()[2].equals("json")) {
+                //Десериализация из .json файла
+                try (FileInputStream fis = new FileInputStream(xmlData.getLoad()[1]);
+                     ObjectInputStream ois = new ObjectInputStream(fis)) {
+                    basket = (Basket) ois.readObject();
+                } catch (Exception ex) {
+                    System.out.println("ERR");
+                }
+            } else {
+                basket = new Basket(products, price);
+                File file = new File(xmlData.getSave()[1]);
+                basket.loadFromTxtFile(file);
             }
         } else {
             basket = new Basket(products, price);
+            xmlData.setLoadEnabled();
         }
         ClientLog clientLog = new ClientLog(products, basket);
+
 
         while (!isEnd) {
             System.out.println("Список возможных товаров для покупки");
@@ -47,14 +60,27 @@ public class Main implements Serializable {
                     int productNum = Integer.parseInt(parts[0]);
                     int amount = Integer.parseInt(parts[1]);
                     basket.addToCart(productNum, amount);
-                    clientLog.log(productNum, amount); //Вызов метода log
 
-                    // Сериализация через .json файл
-                    try (FileOutputStream fos = new FileOutputStream(file);
-                         ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-                        oos.writeObject(basket);
-                    } catch (IOException e) {
-                        System.out.println("Файл открыт");
+                    if (xmlData.getLog()[0].equals("true")) {
+                        File file = new File(xmlData.getLog()[1]);
+                        clientLog.log(productNum, amount, file); //Вызов метода log
+                    }
+
+                    if (xmlData.getSave()[0].equals("true")){
+
+                        if (xmlData.getSave()[2].equals("json")) {
+
+                            // Сериализация через .json файл
+                            try (FileOutputStream fos = new FileOutputStream(xmlData.getSave()[1]);
+                                 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                                oos.writeObject(basket);
+                            } catch (IOException e) {
+                                System.out.println("Файл открыт");
+                            }
+                        } else {
+                            File file = new File(xmlData.getSave()[1]);
+                            basket.saveTxt(file);
+                        }
                     }
                 } catch (NumberFormatException nf) {
                     System.out.println("Введено некорректное значение");

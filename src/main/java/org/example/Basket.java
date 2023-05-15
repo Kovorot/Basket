@@ -78,7 +78,6 @@ public class Basket {
     }
 
     public void saveTxt(File textFile) {
-        textFile = new File("Basket.txt");
 
         if (!textFile.exists()) {
 
